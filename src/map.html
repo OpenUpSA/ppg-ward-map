@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      html,
+      body,
+      div#map {
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .text-pin {
+        width: auto !important;
+        text-align: center;
+        height: auto !important;
+        background-image: url("images/pinpoint.png");
+        background-repeat: no-repeat;
+        background-position: center bottom;
+        outline: red !important;
+
+        padding-bottom: 25px;
+      }
+
+      .text-pin div {
+        box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+        background-color: #8334f7;
+        color: #fff;
+        border-radius: 10px;
+        white-space: nowrap;
+        padding: 5px 10px;
+      }
+
+      .is-filter-contrast-high {
+        filter: contrast(500%) grayscale(100%);
+      }
+
+      .is-filter-grayscale-bw {
+        filter: grayscale(100%);
+      }
+
+      .leaflet-tooltip-top.tooltip {
+        border-radius: 10px !important;
+        font-weight: bold !important;
+      }
+
+      .icon-marker {
+        background-color: #eee;
+        border: solid 4px #fff!important;
+        border-radius: 100%;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script src="random-points-on-polygon.js"></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBc15woji15KUqe8SxJoVpwRP4sB7Mtmk"
+      async
+      defer
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+    <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script>
+    <script src="municipality.js"></script>
+    <script src="map.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map = L.map("map");
+      var latlng = [];
+      var youAreHereLatlng = [];
+      var zoom = 9;
+      var areas = [];
+      var areaIds = [];
+      var areasGeojson = [];
+
+      var random = function (top = 6) {
+        return Math.floor(Math.random() * top);
+      };
+
+      var loadMap = () => {
+        if (areasGeojson.length === areaIds.length) {
+          areas = L.geoJSON(areasGeojson, {
+            style: {
+              color: "#8334f7",
+              fillOpacity: 0.01,
+              dashArray: "3,3",
+              weight: 2,
+            },
+          }).addTo(map);
+
+          areas.getLayers().forEach((layer) => {
+            var label = layer.feature.geometry.label;
+            var layerCenter = layer.getBounds().getCenter();
+            var politicalParty =
+              politicalParties[random(politicalParties.length)];
+
+            if (wardId == label) {
+              var iconMarker = L.marker(layerCenter, {
+                icon: politicalParty["wardCouncillor"]["icon"],
+                riseOnHover: true,
+              }).addTo(map);
+
+              iconMarker.on("click", (e) => {
+                parent.document.location.search = `municipalityid=${municipalityId}&wardid=${label}`;
+              });
+
+              iconMarker.bindTooltip(
+                `${politicalParty["wardCouncillor"]["name"]} - ${politicalParty["party"]["name"]}`,
+                {
+                  direction: "top",
+                  offset: [0, -16],
+                  className: "tooltip",
+                  permanent: false,
+                  opacity: 1,
+                }
+              );
+
+              var wardLatlng = randomPointsOnPolygon(
+                1,
+                layer.feature
+              )[0].geometry.coordinates.reverse();
+              console.log(wardLatlng);
+              var wardOffice = L.divIcon({
+                className: "text-pin",
+                iconAnchor: [40, 48],
+                html: `<div>Ward office</div>`,
+              });
+              layer.setStyle({
+                dashArray: null,
+                weight: 3,
+                fillOpacity: 0.05,
+              });
+              map.fitBounds(layer.getBounds());
+
+              L.marker(wardLatlng, {
+                icon: wardOffice,
+                riseOnHover: true,
+              }).addTo(map);
+            } else {
+              var iconMarker = L.marker(layerCenter, {
+                icon: politicalParty["party"]["icon"],
+                riseOnHover: true,
+                bubblingMouseEvents: true,
+              }).addTo(map);
+
+              iconMarker.on("click", (e) => {
+                parent.document.location.search = `municipalityid=${municipalityId}&wardid=${label}`;
+              });
+
+              iconMarker.bindTooltip(
+                `${municipality["info"]["name"]}, Ward ${label}`,
+                {
+                  direction: "top",
+                  offset: [0, -16],
+                  className: "tooltip",
+                  permanent: false,
+                  riseOnHover: true,
+                  opacity: 1,
+                }
+              );
+            }
+
+            layer.on("click", (e) => {
+              var label = e.target.feature.geometry.label;
+              parent.document.location.search = `municipalityid=${municipalityId}&wardid=${label}`;
+            });
+
+            layer.on("mouseover", (e) => {
+              e.target.setStyle({
+                dashArray: null,
+                weight: 3,
+                fillOpacity: 0.05,
+              });
+            });
+
+            layer.on("mouseout", (e) => {
+              if (e.target.feature.geometry.label != wardId) {
+                areas.resetStyle(e.target);
+              }
+            });
+          });
+        } else {
+          setTimeout(loadMap, 1000);
+        }
+      };
+
+      L.gridLayer
+        .googleMutant({
+          type: "roadmap",
+        })
+        .addTo(map);
+
+      $.getJSON(
+        "https://mapit.code4sa.org/area/" + municipalityId + "/geometry",
+        (data) => {
+          municipality["geometry"] = data;
+          latlng = [
+            municipality["geometry"]["centre_lat"],
+            municipality["geometry"]["centre_lon"],
+          ];
+          map.setView(latlng, zoom);
+          L.marker(latlng, { icon: municipalOffice, riseOnHover: true }).addTo(
+            map
+          );
+        }
+      );
+
+      $.getJSON(
+        "https://mapit.code4sa.org/area/" + municipalityId + "/children.json",
+        (data) => {
+          municipality["children"] = data;
+          areaIds = Object.keys(municipality["children"]);
+          areaIds.forEach(async function (areaId) {
+            $.getJSON(
+              "https://mapit.code4sa.org/area/" + areaId + ".geojson",
+              (data) => {
+                data["label"] = areaId;
+                data["id"] = areaId;
+                areasGeojson.push(data);
+              }
+            );
+          });
+          loadMap();
+        }
+      );
+
+      var politicalParties = [
+        {
+          wardCouncillor: {
+            name: "Daniel Kapungwe",
+            icon: L.icon({
+              iconUrl: "images/danielkapungwe.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+              className: "icon-marker"
+            }),
+          },
+          party: {
+            name: "ANC",
+            icon: L.icon({
+              iconUrl: "images/anc.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+              className: "icon-marker"
+            }),
+          },
+        },
+        {
+          wardCouncillor: {
+            name: "Bukelani Zuma",
+            icon: L.icon({
+              iconUrl: "images/bukelanizuma.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+              className: "icon-marker"
+            }),
+          },
+          party: {
+            name: "IFP",
+            icon: L.icon({
+              iconUrl: "images/ifp.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+              className: "icon-marker"
+            }),
+          },
+        },
+        {
+          wardCouncillor: {
+            name: "Stuart Pringle",
+            icon: L.icon({
+              iconUrl: "images/stuartpringle.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+              className: "icon-marker"
+            }),
+          },
+          party: {
+            name: "DA",
+            icon: L.icon({
+              iconUrl: "images/da.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+              className: "icon-marker"
+            }),
+          },
+        },
+      ];
+
+      var municipalOffice = L.divIcon({
+        className: "text-pin is-filter-grayscale-bw",
+        iconAnchor: [52, 48],
+        html: "<div>Municipal office</div>",
+      });
+
+      var youAreHere = L.divIcon({
+        className: "text-pin is-filter-contrast-high",
+        iconAnchor: [42, 48],
+        html: "<div>You are here</div>",
+      });
+
+      var geolocationSuccess = function (position) {
+        youAreHereLatlng = [
+          position.coords.latitude,
+          position.coords.longitude,
+        ];
+
+        L.marker(youAreHereLatlng, {
+          icon: youAreHere,
+          riseOnHover: true,
+        }).addTo(map);
+      };
+
+      var geolocationError = function (error) {
+        console.log(error);
+      };
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          geolocationSuccess,
+          geolocationError
+        );
+      } else {
+        console.log("No geolocation");
+      }
+
+      $.getJSON(
+        "https://mapit.code4sa.org/area/" + municipalityId + ".json",
+        (data) => {
+          municipality["info"] = data;
+        }
+      );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cape Agulhas Municipality</title>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="municipality.js"></script>
+    <script src="map.js"></script>
+    <link rel="stylesheet" href="css/base.css" />
+  </head>
+  <body>
+    <h1><span class="data-municipality-name"></span> Municipality</h1>
+    <iframe class="data-src-wardid data-src-municipalityid" src="/map" frameborder="0"></iframe>
+    <div>
+      <div class="row">
+        <div class="column">
+          <ul class="data-has-children">
+            <li>
+              <a class="data-href-municipality-id" href="?"><span class="data-municipality-name"></span> Municipality </a>
+            </li>
+            <li class="is-hidden data-template data-municipal-child">
+              <a href=""></a>
+            </li>
+          </ul>
+        </div>
+        <div class="column">
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni
+            beatae eos pariatur assumenda, fuga sit quasi a natus minima quae
+            eligendi perspiciatis necessitatibus exercitationem ipsam, non amet
+            architecto quo. Laudantium?
+          </p>
+        </div>
+      </div>
+    </div>
+    <script>
+      updateMapEmbed();
+
+      if (municipalityId) {
+        $.getJSON(
+          "https://mapit.code4sa.org/area/" + municipalityId + ".json",
+          (data) => {
+            municipality['info'] = data;
+            updateMunicipalInfo();
+          }
+        );
+
+        $.getJSON(
+          "https://mapit.code4sa.org/area/" + municipalityId + "/children.json",
+          (data) => {
+            municipality['children'] = data;
+            updateMunicipalChildren();
+          }
+        );
+      }
+    </script>
+  </body>
+</html>
