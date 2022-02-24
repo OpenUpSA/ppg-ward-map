@@ -51,7 +51,7 @@
 
       .icon-marker {
         background-color: #eee;
-        border: solid 4px #fff!important;
+        border: solid 4px #fff !important;
         border-radius: 100%;
       }
     </style>
@@ -87,11 +87,11 @@
     <script>
       var map = L.map("map");
       var latlng = [];
-      var youAreHereLatlng = [];
       var zoom = 9;
       var areas = [];
       var areaIds = [];
       var areasGeojson = [];
+      var youAreHereLatlng = null;
 
       var random = function (top = 6) {
         return Math.floor(Math.random() * top);
@@ -113,6 +113,24 @@
             var layerCenter = layer.getBounds().getCenter();
             var politicalParty =
               politicalParties[random(politicalParties.length)];
+
+            if ((wardId && wardId == label) || (!wardId && !youAreHereLatlng)) {
+              var youAreHere = L.divIcon({
+                className: "text-pin is-filter-contrast-high",
+                iconAnchor: [42, 48],
+                html: "<div>You are here</div>",
+              });
+
+              youAreHereLatlng = randomPointsOnPolygon(
+                1,
+                layer.feature
+              )[0].geometry.coordinates.reverse();
+
+              L.marker(youAreHereLatlng, {
+                icon: youAreHere,
+                riseOnHover: true,
+              }).addTo(map);
+            }
 
             if (wardId == label) {
               var iconMarker = L.marker(layerCenter, {
@@ -139,7 +157,7 @@
                 1,
                 layer.feature
               )[0].geometry.coordinates.reverse();
-              console.log(wardLatlng);
+
               var wardOffice = L.divIcon({
                 className: "text-pin",
                 iconAnchor: [40, 48],
@@ -252,7 +270,7 @@
               iconUrl: "images/danielkapungwe.png",
               iconSize: [32, 32],
               iconAnchor: [16, 16],
-              className: "icon-marker"
+              className: "icon-marker",
             }),
           },
           party: {
@@ -261,7 +279,7 @@
               iconUrl: "images/anc.png",
               iconSize: [32, 32],
               iconAnchor: [16, 16],
-              className: "icon-marker"
+              className: "icon-marker",
             }),
           },
         },
@@ -272,7 +290,7 @@
               iconUrl: "images/bukelanizuma.png",
               iconSize: [32, 32],
               iconAnchor: [16, 16],
-              className: "icon-marker"
+              className: "icon-marker",
             }),
           },
           party: {
@@ -281,7 +299,7 @@
               iconUrl: "images/ifp.png",
               iconSize: [32, 32],
               iconAnchor: [16, 16],
-              className: "icon-marker"
+              className: "icon-marker",
             }),
           },
         },
@@ -292,7 +310,7 @@
               iconUrl: "images/stuartpringle.png",
               iconSize: [32, 32],
               iconAnchor: [16, 16],
-              className: "icon-marker"
+              className: "icon-marker",
             }),
           },
           party: {
@@ -301,7 +319,7 @@
               iconUrl: "images/da.png",
               iconSize: [32, 32],
               iconAnchor: [16, 16],
-              className: "icon-marker"
+              className: "icon-marker",
             }),
           },
         },
@@ -312,37 +330,6 @@
         iconAnchor: [52, 48],
         html: "<div>Municipal office</div>",
       });
-
-      var youAreHere = L.divIcon({
-        className: "text-pin is-filter-contrast-high",
-        iconAnchor: [42, 48],
-        html: "<div>You are here</div>",
-      });
-
-      var geolocationSuccess = function (position) {
-        youAreHereLatlng = [
-          position.coords.latitude,
-          position.coords.longitude,
-        ];
-
-        L.marker(youAreHereLatlng, {
-          icon: youAreHere,
-          riseOnHover: true,
-        }).addTo(map);
-      };
-
-      var geolocationError = function (error) {
-        console.log(error);
-      };
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          geolocationSuccess,
-          geolocationError
-        );
-      } else {
-        console.log("No geolocation");
-      }
 
       $.getJSON(
         "https://mapit.code4sa.org/area/" + municipalityId + ".json",
