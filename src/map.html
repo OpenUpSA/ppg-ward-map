@@ -331,10 +331,69 @@
         html: "<div>Municipal office</div>",
       });
 
+      var updateNeighbourMunicipalities = function () {
+        var neighbourIds = Object.keys(municipality["neighbours"]);
+        neighbourIds.forEach(function (neighbourId) {
+          var neighbour = municipality["neighbours"][neighbourId];
+          if (neighbour["type"] === "MN") {
+            $.getJSON(
+              "https://mapit.code4sa.org/area/" + neighbourId + ".geojson",
+              (data) => {
+                var layer = L.geoJSON(data, {
+                  style: {
+                    color: "#999",
+                    fillOpacity: 0.01,
+                    dashArray: "3,3",
+                    weight: 2,
+                  },
+                }).addTo(map);
+
+                layer.bindTooltip(
+                `${neighbour["name"]} municipality`,
+                {
+                  direction: "top",
+                  className: "tooltip",
+                }
+              );
+
+                layer.on("click", (e) => {
+                  parent.document.location.search = `municipalityid=${neighbourId}`;
+                });
+
+                layer.on("mouseover", (e) => {
+                  e.target.setStyle({
+                    dashArray: null,
+                    weight: 3,
+                    fillOpacity: 0.05,
+                  });
+                });
+
+                layer.on("mouseout", (e) => {
+                  e.target.setStyle({
+                    color: "#999",
+                    fillOpacity: 0.01,
+                    dashArray: "3,3",
+                    weight: 2,
+                  });
+                });
+              }
+            );
+          }
+        });
+      };
+
       $.getJSON(
         "https://mapit.code4sa.org/area/" + municipalityId + ".json",
         (data) => {
           municipality["info"] = data;
+        }
+      );
+
+      $.getJSON(
+        "https://mapit.code4sa.org/area/" + municipalityId + "/touches",
+        (data) => {
+          municipality["neighbours"] = data;
+          updateNeighbourMunicipalities();
         }
       );
     </script>
