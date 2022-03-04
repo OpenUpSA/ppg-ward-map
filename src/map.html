@@ -335,6 +335,8 @@
         var neighbourIds = Object.keys(municipality["neighbours"]);
         neighbourIds.forEach(function (neighbourId) {
           var neighbour = municipality["neighbours"][neighbourId];
+          var parentAreaId = neighbour["parent_area"];
+
           if (neighbour["type"] === "WD") {
             $.getJSON(
               "https://mapit.code4sa.org/area/" + neighbourId + ".geojson",
@@ -357,7 +359,7 @@
               );
 
                 layer.on("click", (e) => {
-                  parent.document.location.search = `municipalityid=${neighbourId}`;
+                  parent.document.location.search = `municipalityid=${parentAreaId}&wardid=${neighbourId}`;
                 });
 
                 layer.on("mouseover", (e) => {
