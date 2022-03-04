@@ -335,7 +335,7 @@
         var neighbourIds = Object.keys(municipality["neighbours"]);
         neighbourIds.forEach(function (neighbourId) {
           var neighbour = municipality["neighbours"][neighbourId];
-          if (neighbour["type"] === "MN") {
+          if (neighbour["type"] === "WD") {
             $.getJSON(
               "https://mapit.code4sa.org/area/" + neighbourId + ".geojson",
               (data) => {
@@ -349,7 +349,7 @@
                 }).addTo(map);
 
                 layer.bindTooltip(
-                `${neighbour["name"]} municipality`,
+                `${neighbour["name"]}`,
                 {
                   direction: "top",
                   className: "tooltip",
