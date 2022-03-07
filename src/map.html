@@ -93,6 +93,22 @@
       var areasGeojson = [];
       var youAreHereLatlng = null;
 
+      var canAccessParent = function () {
+        try {
+          return !!parent.document.location.search;
+        } catch (err) {
+          return false;
+        }
+      };
+
+      var updateParentOrSelfLocationSearch = function (search) {
+        if (canAccessParent()) {
+          parent.document.location.search = search;
+        } else {
+          document.location.search = search;
+        }
+      };
+
       var random = function (top = 6) {
         return Math.floor(Math.random() * top);
       };
@@ -139,7 +155,7 @@
               }).addTo(map);
 
               iconMarker.on("click", (e) => {
-                parent.document.location.search = `municipalityid=${municipalityId}&wardid=${label}`;
+                updateParentOrSelfLocationSearch(`municipalityid=${municipalityId}&wardid=${label}`);
               });
 
               iconMarker.bindTooltip(
@@ -182,7 +198,7 @@
               }).addTo(map);
 
               iconMarker.on("click", (e) => {
-                parent.document.location.search = `municipalityid=${municipalityId}&wardid=${label}`;
+                updateParentOrSelfLocationSearch(`municipalityid=${municipalityId}&wardid=${label}`);
               });
 
               iconMarker.bindTooltip(
@@ -200,7 +216,7 @@
 
             layer.on("click", (e) => {
               var label = e.target.feature.geometry.label;
-              parent.document.location.search = `municipalityid=${municipalityId}&wardid=${label}`;
+              updateParentOrSelfLocationSearch(`municipalityid=${municipalityId}&wardid=${label}`);
             });
 
             layer.on("mouseover", (e) => {
@@ -350,16 +366,13 @@
                   },
                 }).addTo(map);
 
-                layer.bindTooltip(
-                `${neighbour["name"]}`,
-                {
+                layer.bindTooltip(`${neighbour["name"]}`, {
                   direction: "top",
                   className: "tooltip",
-                }
-              );
+                });
 
                 layer.on("click", (e) => {
-                  parent.document.location.search = `municipalityid=${parentAreaId}&wardid=${neighbourId}`;
+                  updateParentOrSelfLocationSearch(`municipalityid=${parentAreaId}&wardid=${neighbourId}`);
                 });
 
                 layer.on("mouseover", (e) => {
