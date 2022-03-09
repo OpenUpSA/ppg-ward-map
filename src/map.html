@@ -148,27 +148,38 @@
               }).addTo(map);
             }
 
-            if (wardId == label) {
-              var iconMarker = L.marker(layerCenter, {
-                icon: politicalParty["wardCouncillor"]["icon"],
-                riseOnHover: true,
-              }).addTo(map);
+            var iconMarker = L.marker(layerCenter, {
+              icon: politicalParty["party"]["icon"],
+              riseOnHover: true,
+              bubblingMouseEvents: true,
+            }).addTo(map);
 
-              iconMarker.on("click", (e) => {
-                updateParentOrSelfLocationSearch(`municipalityid=${municipalityId}&wardid=${label}`);
-              });
-
-              iconMarker.bindTooltip(
-                `${politicalParty["wardCouncillor"]["name"]} - ${politicalParty["party"]["name"]}`,
-                {
-                  direction: "top",
-                  offset: [0, -16],
-                  className: "tooltip",
-                  permanent: false,
-                  opacity: 1,
-                }
+            iconMarker.on("click", (e) => {
+              updateParentOrSelfLocationSearch(
+                `municipalityid=${municipalityId}&wardid=${label}`
               );
+            });
 
+            iconMarker.bindTooltip(
+              `${politicalParty["wardCouncillor"]["name"]} - ${politicalParty["party"]["name"]}`,
+              {
+                direction: "top",
+                offset: [0, -16],
+                className: "tooltip",
+                permanent: false,
+                opacity: 1,
+              }
+            );
+
+            iconMarker.on("mouseover", (e) => {
+              e.target.setIcon(politicalParty["wardCouncillor"]["icon"]);
+            });
+
+            iconMarker.on("mouseout", (e) => {
+              e.target.setIcon(politicalParty["party"]["icon"]);
+            });
+
+            if (wardId == label) {
               var wardLatlng = randomPointsOnPolygon(
                 1,
                 layer.feature
@@ -190,33 +201,13 @@
                 icon: wardOffice,
                 riseOnHover: true,
               }).addTo(map);
-            } else {
-              var iconMarker = L.marker(layerCenter, {
-                icon: politicalParty["party"]["icon"],
-                riseOnHover: true,
-                bubblingMouseEvents: true,
-              }).addTo(map);
-
-              iconMarker.on("click", (e) => {
-                updateParentOrSelfLocationSearch(`municipalityid=${municipalityId}&wardid=${label}`);
-              });
-
-              iconMarker.bindTooltip(
-                `${municipality["info"]["name"]}, Ward ${label}`,
-                {
-                  direction: "top",
-                  offset: [0, -16],
-                  className: "tooltip",
-                  permanent: false,
-                  riseOnHover: true,
-                  opacity: 1,
-                }
-              );
             }
 
             layer.on("click", (e) => {
               var label = e.target.feature.geometry.label;
-              updateParentOrSelfLocationSearch(`municipalityid=${municipalityId}&wardid=${label}`);
+              updateParentOrSelfLocationSearch(
+                `municipalityid=${municipalityId}&wardid=${label}`
+              );
             });
 
             layer.on("mouseover", (e) => {
@@ -372,7 +363,9 @@
                 });
 
                 layer.on("click", (e) => {
-                  updateParentOrSelfLocationSearch(`municipalityid=${parentAreaId}&wardid=${neighbourId}`);
+                  updateParentOrSelfLocationSearch(
+                    `municipalityid=${parentAreaId}&wardid=${neighbourId}`
+                  );
                 });
 
                 layer.on("mouseover", (e) => {
