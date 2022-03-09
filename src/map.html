@@ -44,6 +44,7 @@
         filter: grayscale(100%);
       }
 
+      .tooltip .leaflet-popup-content,
       .leaflet-tooltip-top.tooltip {
         border-radius: 10px !important;
         font-weight: bold !important;
@@ -147,6 +148,23 @@
                 riseOnHover: true,
               }).addTo(map);
             }
+
+            var popup = L.popup({ className: "tooltip", closeButton: false });
+            popup.setContent(`${municipality["info"]["name"]} Ward ${label}`);
+            layer.bindPopup(popup);
+
+            layer.on("mouseover", function (e) {
+              var popup = e.target.getPopup();
+              popup.setLatLng(e.latlng).openOn(map);
+            });
+
+            layer.on("mouseout", function (e) {
+              e.target.closePopup();
+            });
+
+            layer.on("mousemove", function (e) {
+              popup.setLatLng(e.latlng).openOn(map);
+            });
 
             var iconMarker = L.marker(layerCenter, {
               icon: politicalParty["party"]["icon"],
@@ -357,9 +375,24 @@
                   },
                 }).addTo(map);
 
-                layer.bindTooltip(`${neighbour["name"]}`, {
-                  direction: "top",
+                var popup = L.popup({
                   className: "tooltip",
+                  closeButton: false,
+                });
+                popup.setContent(neighbour["name"]);
+                layer.bindPopup(popup);
+
+                layer.on("mouseover", function (e) {
+                  var popup = e.target.getPopup();
+                  popup.setLatLng(latlng).openOn(map);
+                });
+
+                layer.on("mouseout", function (e) {
+                  e.target.closePopup();
+                });
+
+                layer.on("mousemove", function (e) {
+                  popup.setLatLng(e.latlng).openOn(map);
                 });
 
                 layer.on("click", (e) => {
