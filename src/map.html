@@ -55,6 +55,10 @@
         border: solid 4px #fff !important;
         border-radius: 100%;
       }
+
+      .is-pointer-events-none {
+        pointer-events: none !important;
+      }
     </style>
     <link
       rel="stylesheet"
@@ -133,9 +137,11 @@
 
             if ((wardId && wardId == label) || (!wardId && !youAreHereLatlng)) {
               var youAreHere = L.divIcon({
-                className: "text-pin is-filter-contrast-high",
+                className:
+                  "text-pin is-filter-contrast-high is-pointer-events-none",
                 iconAnchor: [42, 48],
                 html: "<div>You are here</div>",
+                interactive: false,
               });
 
               youAreHereLatlng = randomPointsOnPolygon(
@@ -351,9 +357,10 @@
       ];
 
       var municipalOffice = L.divIcon({
-        className: "text-pin is-filter-grayscale-bw",
+        className: "text-pin is-filter-grayscale-bw is-pointer-events-none",
         iconAnchor: [52, 48],
         html: "<div>Municipal office</div>",
+        interactive: false,
       });
 
       var updateNeighbourMunicipalities = function () {
