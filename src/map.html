@@ -122,9 +122,8 @@
         if (areasGeojson.length === areaIds.length) {
           areas = L.geoJSON(areasGeojson, {
             style: {
-              color: "#8334f7",
+              color: "#999",
               fillOpacity: 0.01,
-              dashArray: "3,3",
               weight: 2,
             },
           }).addTo(map);
@@ -152,6 +151,7 @@
               L.marker(youAreHereLatlng, {
                 icon: youAreHere,
                 riseOnHover: true,
+                bubblingMouseEvents: true
               }).addTo(map);
             }
 
@@ -215,15 +215,17 @@
                 html: `<div>Ward office</div>`,
               });
               layer.setStyle({
-                dashArray: null,
                 weight: 3,
                 fillOpacity: 0.05,
+                color: "#8334f7",
               });
+              layer.bringToFront();
               map.fitBounds(layer.getBounds());
 
               L.marker(wardLatlng, {
                 icon: wardOffice,
                 riseOnHover: true,
+                bubblingMouseEvents: true
               }).addTo(map);
             }
 
@@ -236,10 +238,11 @@
 
             layer.on("mouseover", (e) => {
               e.target.setStyle({
-                dashArray: null,
                 weight: 3,
                 fillOpacity: 0.05,
+                color: "#8334f7",
               });
+              e.target.bringToFront();
             });
 
             layer.on("mouseout", (e) => {
@@ -268,7 +271,7 @@
             municipality["geometry"]["centre_lon"],
           ];
           map.setView(latlng, zoom);
-          L.marker(latlng, { icon: municipalOffice, riseOnHover: true }).addTo(
+          L.marker(latlng, { icon: municipalOffice, riseOnHover: true, bubblingMouseEvents: true }).addTo(
             map
           );
         }
@@ -302,6 +305,7 @@
               iconSize: [32, 32],
               iconAnchor: [16, 16],
               className: "icon-marker",
+              bubblingMouseEvents: true
             }),
           },
           party: {
@@ -311,6 +315,7 @@
               iconSize: [32, 32],
               iconAnchor: [16, 16],
               className: "icon-marker",
+              bubblingMouseEvents: true
             }),
           },
         },
@@ -322,6 +327,7 @@
               iconSize: [32, 32],
               iconAnchor: [16, 16],
               className: "icon-marker",
+              bubblingMouseEvents: true
             }),
           },
           party: {
@@ -331,6 +337,7 @@
               iconSize: [32, 32],
               iconAnchor: [16, 16],
               className: "icon-marker",
+              bubblingMouseEvents: true
             }),
           },
         },
@@ -342,6 +349,7 @@
               iconSize: [32, 32],
               iconAnchor: [16, 16],
               className: "icon-marker",
+              bubblingMouseEvents: true
             }),
           },
           party: {
@@ -351,6 +359,7 @@
               iconSize: [32, 32],
               iconAnchor: [16, 16],
               className: "icon-marker",
+              bubblingMouseEvents: true
             }),
           },
         },
@@ -375,9 +384,8 @@
               (data) => {
                 var layer = L.geoJSON(data, {
                   style: {
-                    color: "#999",
+                    color: "#ccc",
                     fillOpacity: 0.01,
-                    dashArray: "3,3",
                     weight: 2,
                   },
                 }).addTo(map);
@@ -410,19 +418,18 @@
 
                 layer.on("mouseover", (e) => {
                   e.target.setStyle({
-                    dashArray: null,
-                    weight: 3,
+                    color: "#999",
                     fillOpacity: 0.05,
                   });
+                  e.target.bringToFront();
                 });
 
                 layer.on("mouseout", (e) => {
                   e.target.setStyle({
-                    color: "#999",
+                    color: "#ccc",
                     fillOpacity: 0.01,
-                    dashArray: "3,3",
-                    weight: 2,
                   });
+                  e.target.bringToBack();
                 });
               }
             );
